@@ -1,9 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from decimal import Decimal
 
 class ItemBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
+    price: Decimal = Field(..., gt=0)
 
 class ItemCreate(ItemBase):
     pass
@@ -11,6 +13,7 @@ class ItemCreate(ItemBase):
 class ItemUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
+    price: Optional[Decimal] = Field(None, gt=0)
 
 class Item(ItemBase):
     id: int

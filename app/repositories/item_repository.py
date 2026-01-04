@@ -17,7 +17,7 @@ class ItemRepository(BaseRepository[ItemModel, ItemCreate, ItemUpdate]):
         return result.scalars().first()
 
     async def create(self, entity_data: ItemCreate):
-        item = ItemModel(**entity_data.dict())
+        item = ItemModel(**entity_data.model_dump())
         self.db.add(item)
         await self.db.commit()
         await self.db.refresh(item)
@@ -27,7 +27,7 @@ class ItemRepository(BaseRepository[ItemModel, ItemCreate, ItemUpdate]):
         result = await self.db.execute(select(ItemModel).where(ItemModel.id == entity_id))
         item = result.scalars().first()
         if item:
-            for key, value in entity_data.dict(exclude_unset=True).items():
+            for key, value in entity_data.model_dump(exclude_unset=True).items():
                 setattr(item, key, value)
             await self.db.commit()
             await self.db.refresh(item)

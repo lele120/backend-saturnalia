@@ -31,7 +31,7 @@ class ItemService:
         try:
             return await self.repository.create(item)
         except IntegrityError:
-            raise HTTPException(400, "Item with this name already exists")
+            raise HTTPException(400, "Item creation failed due to constraint")
         except Exception as e:
             raise HTTPException(500, f"Error creating item: {str(e)}")
 
@@ -41,6 +41,8 @@ class ItemService:
         # Business logic: validate update data
         if item_update.name is not None and not item_update.name.strip():
             raise HTTPException(400, "Item name cannot be empty")
+        if item_update.price is not None and item_update.price <= 0:
+            raise HTTPException(400, "Price must be positive")
         try:
             return await self.repository.update(item_id, item_update)
         except IntegrityError:
