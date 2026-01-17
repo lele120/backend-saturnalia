@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, desc, asc
 from app.models.item import Item as ItemModel
 from app.schemas.item import ItemCreate, ItemUpdate
 from app.repositories.base_repository import BaseRepository
@@ -8,9 +8,20 @@ class ItemRepository(BaseRepository[ItemModel, ItemCreate, ItemUpdate]):
     def __init__(self, db: AsyncSession):
         super().__init__(db, ItemModel)
 
-    async def get_all(self, skip: int = 0, limit: int = 100):
-        result = await self.db.execute(select(ItemModel).offset(skip).limit(limit))
-        return list(result.scalars().all())
+    async def get_all(self, skip: int = 0, limit: int = 100, sort_by: str = None, order: str = "asc"):
+        query = select(ItemModel)
+        if sort_by:
+            if sort_by == "name":
+                column = ItemModel.name
+            elif sort_by == "description":
+                column = ItemModel.description
+            else:
+                column = ItemModel.id  # default
+
+            direction = desc if order == "desc" else asc
+            query = query.order_by(direction(column))
+        result = await self.db.execute(query.offset(skip).limit(limit))
+        return result.scalars().all()
 
     async def get_by_id(self, entity_id: int):
         result = await self.db.execute(select(ItemModel).where(ItemModel.id == entity_id))
