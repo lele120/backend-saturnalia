@@ -4,19 +4,19 @@ from fastapi import HTTPException
 from app.repositories.item_repository import ItemRepository
 from app.schemas.item import ItemCreate, ItemUpdate
 from app.models.item import Item as ItemModel
-from typing import List
+from typing import List, Optional
 
 class ItemService:
     def __init__(self, db: AsyncSession):
         self.repository = ItemRepository(db)
 
-    async def get_items(self, skip: int = 0, limit: int = 100, sort_by: str = None, order: str = "asc") -> List[ItemModel]:
+    async def get_items(self, skip: int = 0, limit: int = 100, sort_by: Optional[str] = None, order: str = "asc", description_filter: Optional[str] = None) -> List[ItemModel]:
         if sort_by and sort_by not in ["name", "description"]:
             raise HTTPException(400, "Invalid sort_by parameter. Must be 'name' or 'description'")
         if order not in ["asc", "desc"]:
             raise HTTPException(400, "Invalid order parameter. Must be 'asc' or 'desc'")
         try:
-            return await self.repository.get_all(skip, limit, sort_by, order)
+            return await self.repository.get_all(skip, limit, sort_by, order, description_filter)
         except Exception as e:
             raise HTTPException(500, f"Error retrieving items: {str(e)}")
 

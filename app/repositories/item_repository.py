@@ -1,15 +1,18 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc, asc
+from sqlalchemy import select, desc, asc, or_
 from app.models.item import Item as ItemModel
 from app.schemas.item import ItemCreate, ItemUpdate
 from app.repositories.base_repository import BaseRepository
+from typing import Optional
 
 class ItemRepository(BaseRepository[ItemModel, ItemCreate, ItemUpdate]):
     def __init__(self, db: AsyncSession):
         super().__init__(db, ItemModel)
 
-    async def get_all(self, skip: int = 0, limit: int = 100, sort_by: str = None, order: str = "asc"):
+    async def get_all(self, skip: int = 0, limit: int = 100, sort_by: Optional[str] = None, order: str = "asc", description_filter: Optional[str] = None):
         query = select(ItemModel)
+        if description_filter:
+            query = query.where(ItemModel.description.ilike(f"%{description_filter}%"))
         if sort_by:
             if sort_by == "name":
                 column = ItemModel.name
@@ -17,11 +20,11 @@ class ItemRepository(BaseRepository[ItemModel, ItemCreate, ItemUpdate]):
                 column = ItemModel.description
             else:
                 column = ItemModel.id  # default
-
             direction = desc if order == "desc" else asc
             query = query.order_by(direction(column))
+            print(f"SQL Query: {str(query)}") 
         result = await self.db.execute(query.offset(skip).limit(limit))
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def get_by_id(self, entity_id: int):
         result = await self.db.execute(select(ItemModel).where(ItemModel.id == entity_id))
