@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from app.database.database import get_db
-from app.schemas.item import Item, ItemCreate, ItemUpdate
+from app.schemas.item import Item, ItemCreate, ItemUpdate, ItemListResponse
 from app.services.item_service import ItemService
 
 router = APIRouter(prefix="/items", tags=["items"])
@@ -12,7 +12,7 @@ async def create_item(item: ItemCreate, db: AsyncSession = Depends(get_db)):
     service = ItemService(db)
     return await service.create_item(item)
 
-@router.get("/", response_model=List[Item])
+@router.get("/", response_model=ItemListResponse)
 async def read_items(skip: int = 0, limit: int = 100, sort_by: Optional[str] = None, order: str = "asc", description_filter: Optional[str] = None, db: AsyncSession = Depends(get_db)):
     service = ItemService(db)
     return await service.get_items(skip, limit, sort_by, order, description_filter)

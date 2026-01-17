@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 from app.repositories.item_repository import ItemRepository
-from app.schemas.item import ItemCreate, ItemUpdate
+from app.schemas.item import ItemCreate, ItemUpdate, ItemListResponse
 from app.models.item import Item as ItemModel
 from typing import List, Optional
 
@@ -10,7 +10,7 @@ class ItemService:
     def __init__(self, db: AsyncSession):
         self.repository = ItemRepository(db)
 
-    async def get_items(self, skip: int = 0, limit: int = 100, sort_by: Optional[str] = None, order: str = "asc", description_filter: Optional[str] = None) -> List[ItemModel]:
+    async def get_items(self, skip: int = 0, limit: int = 100, sort_by: Optional[str] = None, order: str = "asc", description_filter: Optional[str] = None) -> ItemListResponse:
         if sort_by and sort_by not in ["name", "description"]:
             raise HTTPException(400, "Invalid sort_by parameter. Must be 'name' or 'description'")
         if order not in ["asc", "desc"]:

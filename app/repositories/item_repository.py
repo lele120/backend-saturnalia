@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc, asc, or_
+from sqlalchemy import select, desc, asc, or_, func
 from app.models.item import Item as ItemModel
-from app.schemas.item import ItemCreate, ItemUpdate
+from app.schemas.item import ItemCreate, ItemUpdate, ItemListResponse
 from app.repositories.base_repository import BaseRepository
 from typing import Optional
 
@@ -10,9 +10,17 @@ class ItemRepository(BaseRepository[ItemModel, ItemCreate, ItemUpdate]):
         super().__init__(db, ItemModel)
 
     async def get_all(self, skip: int = 0, limit: int = 100, sort_by: Optional[str] = None, order: str = "asc", description_filter: Optional[str] = None):
-        query = select(ItemModel)
+        base_query = select(ItemModel)
         if description_filter:
-            query = query.where(ItemModel.description.ilike(f"%{description_filter}%"))
+            base_query = base_query.where(ItemModel.description.ilike(f"%{description_filter}%"))
+        
+        # Count total
+        count_query = select(func.count()).select_from(base_query.subquery())
+        count_result = await self.db.execute(count_query)
+        total = count_result.scalar()
+        
+        # Apply sorting and pagination
+        query = base_query
         if sort_by:
             if sort_by == "name":
                 column = ItemModel.name
@@ -22,9 +30,11 @@ class ItemRepository(BaseRepository[ItemModel, ItemCreate, ItemUpdate]):
                 column = ItemModel.id  # default
             direction = desc if order == "desc" else asc
             query = query.order_by(direction(column))
-            print(f"SQL Query: {str(query)}") 
+        
         result = await self.db.execute(query.offset(skip).limit(limit))
-        return list(result.scalars().all())
+        items = list(result.scalars().all())
+        
+        return ItemListResponse(items=items, total=total)
 
     async def get_by_id(self, entity_id: int):
         result = await self.db.execute(select(ItemModel).where(ItemModel.id == entity_id))

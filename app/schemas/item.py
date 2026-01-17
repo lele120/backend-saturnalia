@@ -20,3 +20,7 @@ class Item(ItemBase):
 
     class Config:
         from_attributes = True
+
+class ItemListResponse(BaseModel):
+    items: list[Item]
+    total: int
