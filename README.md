@@ -205,6 +205,7 @@ Log configurati in `app/main.py`.
 - Validazione input con Pydantic
 - Gestione errori strutturata
 - Secrets gestiti via variabili ambiente
+- Rate limiting: 100 richieste/minuto per IP (globale, applicato da middleware)
 
 ## Contributi
 

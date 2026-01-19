@@ -18,7 +18,8 @@ router = APIRouter(prefix="/vineyards", tags=["vineyards"])
                 }
             }
         },
-        404: {"description": "Vineyard not found"}
+        404: {"description": "Vineyard not found"},
+        429: {"description": "Too many requests"}
     }
 )
 async def get_vineyard_area(
@@ -41,7 +42,8 @@ async def get_vineyard_area(
                 }
             }
         },
-        404: {"description": "Vineyard or satellite data not found"}
+        404: {"description": "Vineyard or satellite data not found"},
+        429: {"description": "Too many requests"}
     }
 )
 async def get_vineyard_vigor(
@@ -69,7 +71,8 @@ async def get_vineyard_vigor(
                 }
             }
         },
-        404: {"description": "Wine prediction not found"}
+        404: {"description": "Wine prediction not found"},
+        429: {"description": "Too many requests"}
     }
 )
 async def get_wine_prediction(
