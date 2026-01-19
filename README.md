@@ -52,7 +52,7 @@ Backend API per la gestione di vigneti, dati satellitari e previsioni vino, cost
    ```bash
    python -c "
    import asyncio
-   from app.models import user, item, vineyard, satellite_index, wine_prediction
+   from app.models import user, item, vineyard, satellite_index, wine_prediction, terreno
    from app.database.database import engine, Base
    async def init():
        async with engine.begin() as conn:
@@ -60,6 +60,18 @@ Backend API per la gestione di vigneti, dati satellitari e previsioni vino, cost
    asyncio.run(init())
    "
    ```
+
+6. Popola database con dati di esempio:
+   ```bash
+   python populate_db.py
+   ```
+   
+   **Cosa viene popolato:**
+   - 5 utenti (admin, agricoltori, cantine)
+   - 7 items (macchinari, sementi, prodotti agricoli)
+   - 4 vigneti con dati satellitari (25 rilevazioni NDVI/moisure)
+   - 10 previsioni vino per i vigneti
+   - 4 terreni agricoli con particelle catastali associate
 
 6. Avvia server:
    ```bash

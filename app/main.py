@@ -8,6 +8,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from app.routers.user import router as user_router
 from app.routers.item import router as item_router
 from app.routers.vineyard import router as vineyard_router
+from app.routers.terreno import router as terreno_router
 from app.database.database import engine, Base
 
 # Configure logging
@@ -40,6 +41,7 @@ app.add_middleware(
 app.include_router(user_router)
 app.include_router(item_router)
 app.include_router(vineyard_router)
+app.include_router(terreno_router)
 
 @app.get("/")
 def root():
