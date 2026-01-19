@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, Annotated
 
 class VineyardAreaResponse(BaseModel):
     name: str
@@ -11,6 +11,6 @@ class VineyardVigorResponse(BaseModel):
 
 class WinePredictionResponse(BaseModel):
     id: int
-    vintage_year: int
+    vintage_year: int = Field(..., ge=1900, le=2100)
     quality_score: int
     market_price_est: float

@@ -9,10 +9,14 @@ from app.database.database import engine, Base
 
 app = FastAPI(title="FastAPI Scaffold", version="1.0.0")
 
+from app.config import get_settings
+
+settings = get_settings()
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately
+    allow_origins=settings.allowed_origins.split(",") if settings.allowed_origins != "*" else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
